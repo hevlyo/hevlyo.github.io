@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Riquelme Soares | Portfólio</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
+
+    <!-- Ícones Font Awesome -->
+    <script src="https://kit.fontawesome.com/a81368914c.js" crossorigin="anonymous"></script>
+
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+
+        /* Container geral */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+
+        /* Header */
+        header {
+            background: #24292e;
+            color: #fff;
+            padding: 40px 20px 60px;
+            text-align: center;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.3rem;
+            font-weight: 300;
+            margin-bottom: 20px;
+        }
+
+        /* Redes sociais no header */
+        .social-links {
+            margin-top: 15px;
+        }
+
+        .social-links a {
+            display: inline-block;
+            margin: 0 15px;
+            font-size: 1.8rem;
+            color: #fff;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: #1da1f2;
+        }
+
+        /* Navegação fixa */
+        nav {
+            background: #fff;
+            position: sticky;
+            top: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 10px 0;
+        }
+
+        nav ul li {
+            margin: 0 20px;
+        }
+
+        nav ul li a {
+            font-weight: 500;
+            font-size: 1.1rem;
+            color: #24292e;
+            padding: 8px 0;
+            border-bottom: 3px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        nav ul li a:hover,
+        nav ul li a.active {
+            border-bottom: 3px solid #007bff;
+            color: #007bff;
+        }
+
+        /* Seções */
+        section {
+            padding: 60px 0;
+        }
+
+        section h2 {
+            font-size: 2.5rem;
+            color: #24292e;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 700;
+            position: relative;
+        }
+
+        section h2::after {
+            content: '';
+            width: 60px;
+            height: 4px;
+            background: #007bff;
+            display: block;
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        /* Sobre mim */
+        #about p {
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: #555;
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        /* Competências */
+        #skills ul {
+            max-width: 700px;
+            margin: 0 auto;
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        #skills ul li {
+            background: #007bff;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 1rem;
+            box-shadow: 0 3px 6px rgba(0,123,255,0.4);
+            transition: background 0.3s ease;
+            cursor: default;
+        }
+
+        #skills ul li:hover {
+            background: #0056b3;
+        }
+
+        /* Projetos */
+        #projects .project-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+            gap: 30px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .project-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .project-card h3 {
+            margin-bottom: 15px;
+            color: #007bff;
+            font-weight: 700;
+            font-size: 1.4rem;
+        }
+
+        .project-card p {
+            flex-grow: 1;
+            color: #555;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .project-card a {
+            align-self: flex-start;
+            font-weight: 600;
+            color: #007bff;
+            border: 2px solid #007bff;
+            padding: 8px 15px;
+            border-radius: 30px;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .project-card a:hover {
+            background: #007bff;
+            color: #fff;
+        }
+
+        /* Experiência e educação */
+        #experience ul {
+            max-width: 700px;
+            margin: 0 auto;
+            list-style: none;
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        #experience ul li {
+            margin-bottom: 15px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        #experience ul li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #007bff;
+            font-size: 1.5rem;
+            line-height: 1;
+            top: 3px;
+        }
+
+        /* Footer */
+        footer {
+            background: #24292e;
+            color: #fff;
+            text-align: center;
+            padding: 20px 10px;
+            font-size: 0.9rem;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+
+            section h2 {
+                font-size: 2rem;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+            }
+
+            nav ul li {
+                margin: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Riquelme Soares</h1>
+        <p>Desenvolvedor Backend | Java, JavaScript, Python, C#, C/C++</p>
+        <div class="social-links" aria-label="Redes sociais">
+            <a href="https://github.com/hevlyo" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+            <a href="https://br.linkedin.com/in/riquelme-soares/en" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        </div>
+    </header>
+
+    <nav aria-label="Menu de navegação">
+        <ul>
+            <li><a href="#about" class="active">Sobre</a></li>
+            <li><a href="#skills">Competências</a></li>
+            <li><a href="#projects">Projetos</a></li>
+            <li><a href="#experience">Experiência</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <section id="about" tabindex="0">
+            <h2>Sobre Mim</h2>
+            <p>
+                Sou um desenvolvedor backend apaixonado por tecnologia, com experiência em sistemas robustos e escaláveis. Sempre aprendendo e buscando contribuir para projetos inovadores.
+            </p>
+        </section>
+
+        <section id="skills" tabindex="0">
+            <h2>Competências Técnicas</h2>
+            <ul>
+                <li>Java</li>
+                <li>JavaScript</li>
+                <li>Python</li>
+                <li>C#</li>
+                <li>C/C++</li>
+                <li>APIs RESTful</li>
+                <li>Bancos de Dados SQL</li>
+                <li>Git & GitHub</li>
+                <li>socket.io</li>
+                <li>Desenvolvimento Web</li>
+            </ul>
+        </section>
+
+        <section id="projects" tabindex="0">
+            <h2>Projetos em Destaque</h2>
+            <div class="project-list">
+
+                <article class="project-card" tabindex="0">
+                    <h3>Java RESTful API para Santander Dev Week</h3>
+                    <p>API em Java para o evento Santander Dev Week, com foco em boas práticas de backend.</p>
+                    <a href="https://github.com/hevlyo/santander-dev-week" target="_blank" rel="noopener noreferrer" aria-label="Ver projeto Java RESTful API para Santander Dev Week no GitHub">Ver no GitHub</a>
+                </article>
+
+                <article class="project-card" tabindex="0">
+                    <h3>Get started with socket.io</h3>
+                    <p>Projeto para aprender e demonstrar uso de socket.io para comunicação em tempo real.</p>
+                    <a href="https://github.com/hevlyo/get-started-with-socket-io" target="_blank" rel="noopener noreferrer" aria-label="Ver projeto Get started with socket.io no GitHub">Ver no GitHub</a>
+                </article>
+
+                <article class="project-card" tabindex="0">
+                    <h3>Metaverse/Multiplayer Game</h3>
+                    <p>Jogo multiplayer inspirado no Habbo, incluindo funcionalidades de voz.</p>
+                    <a href="https://github.com/hevlyo/metaverse" target="_blank" rel="noopener noreferrer" aria-label="Ver projeto Metaverse/Multiplayer Game no GitHub">Ver no GitHub</a>
+                </article>
+
+                <article class="project-card" tabindex="0">
+                    <h3>Resolução de Atividades de Curso</h3>
+                    <p>Resolução de exercícios e desafios de cursos de programação.</p>
+                    <a href="https://github.com/hevlyo/curso-javascript" target="_blank" rel="noopener noreferrer" aria-label="Ver projeto Resolução de Atividades de Curso no GitHub">Ver no GitHub</a>
+                </article>
+
+                <article class="project-card" tabindex="0">
+                    <h3>Contribuição em Projeto Open Source</h3>
+                    <p>Fork e contribuições para projetos open source.</p>
+                    <a href="https://github.com/hevlyo/lab-open-source" target="_blank" rel="noopener noreferrer" aria-label="Ver projeto Contribuição em Projeto Open Source no GitHub">Ver no GitHub</a>
+                </article>
+
+            </div>
+        </section>
+
+        <section id="experience" tabindex="0">
+            <h2>Experiência & Educação</h2>
+            <ul>
+                <li><strong>Backend Developer</strong> com experiência em Java, C#, JavaScript, C/C++, SQL e Git.</li>
+                <li>Formação acadêmica pela Universidade Federal do Rio Grande do Norte.</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Riquelme Soares. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        // Script para destacar link ativo no menu conforme scroll
+        const sections = document.querySelectorAll('section');
+        const navLi = document.querySelectorAll('nav ul li a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 70;
+                if (pageYOffset >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLi.forEach(a => {
+                a.classList.remove('active');
+                if (a.getAttribute('href') === '#' + current) {
+                    a.classList.add('active');
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
