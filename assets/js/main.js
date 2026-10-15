@@ -2,7 +2,7 @@ import { initI18n } from './core/i18n.js';
 import { $$, whenNear } from './core/util.js';
 import { initTheme } from './ui/theme.js';
 import { splitHero, initReveal, initWords, initScramble, initRedactions, initMarquee } from './ui/effects.js';
-import { initTopbar, initLangToggle, initKbd, initClock, greet } from './ui/chrome.js';
+import { initTopbar, initLangToggle, initKbd, initClock, initMotionToggle, greet } from './ui/chrome.js';
 import { initCursor } from './ui/cursor.js';
 import { initPalette } from './ui/palette.js';
 import { initSky } from './sky/sky.js';
@@ -20,6 +20,7 @@ root.classList.add('is-booted');
 const steps = [
   initTheme,
   initLangToggle,
+  initMotionToggle,
   initKbd,
   initTopbar,
   initScramble,
@@ -54,7 +55,7 @@ for (const host of $$('[data-artifact]')) {
     } catch (error) {
       console.error(`[artifact] ${host.dataset.artifact} failed`, error);
     }
-  }, '700px 0px');
+  }, '1600px 0px');
 }
 
 requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('is-ready')));

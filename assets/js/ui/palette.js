@@ -1,6 +1,7 @@
 import { $, h, normalize, escapeHtml, toast, isMac } from '../core/util.js';
 import { pick, onLang, toggleLang } from '../core/i18n.js';
 import { toggleTheme } from './theme.js';
+import { isStill, toggleStill } from '../core/motion.js';
 import { skyControl } from '../sky/sky.js';
 
 /* ---------- Knowledge base: short passages, retrieved with BM25 ---------- */
@@ -9,13 +10,13 @@ const DOCS = [
   {
     href: '#sobre', section: ['Sobre', 'About'],
     title: ['Quem é Riquelme Soares', 'Who Riquelme Soares is'],
-    text: ['Engenheiro full-stack e de IA em Natal, RN. Transforma processos manuais em sistemas que funcionam sozinhos — APIs, arquiteturas orientadas a eventos, LLMs e agentes de IA em produção.', 'Full-stack and AI engineer in Natal, Brazil. Turns manual processes into systems that run on their own — APIs, event-driven architectures, LLMs and AI agents in production.'],
+    text: ['Engenheiro full-stack e de IA em Natal, RN. Transforma processos manuais em sistemas que funcionam sozinhos, com APIs, arquiteturas orientadas a eventos, LLMs e agentes de IA em produção.', 'Full-stack and AI engineer in Natal, Brazil. Turns manual processes into systems that run on their own, with APIs, event-driven architectures, LLMs and AI agents in production.'],
     keywords: 'riquelme soares hevlyo engenheiro engineer desenvolvedor developer dev quem who perfil profile sobre about',
   },
   {
     href: '#trabalho', section: ['Trabalho', 'Work'],
     title: ['Onde trabalha hoje', 'Where he works now'],
-    text: ['Atualmente na PGM Natal — Procuradoria Geral do Município de Natal — e na AMentoria Educação.', 'Currently at PGM Natal — Natal’s Municipal Attorney General’s Office — and at AMentoria Educação.'],
+    text: ['Atualmente na PGM Natal (Procuradoria Geral do Município de Natal) e na AMentoria Educação.', 'Currently at PGM Natal (Natal’s Municipal Attorney General’s Office) and at AMentoria Educação.'],
     keywords: 'emprego job empresa company atual current trabalha works experiencia experience',
   },
   {
@@ -75,7 +76,7 @@ const DOCS = [
   {
     href: '#stack', section: ['Stack', 'Stack'],
     title: ['Frontend', 'Frontend'],
-    text: ['React, Next.js, TypeScript e Tailwind CSS — e WebGL quando a ideia pede.', 'React, Next.js, TypeScript and Tailwind CSS — and WebGL when the idea calls for it.'],
+    text: ['React, Next.js, TypeScript e Tailwind CSS. WebGL para gráficos como o céu deste site.', 'React, Next.js, TypeScript and Tailwind CSS. WebGL for graphics like this site’s sky.'],
     keywords: 'front interface ui web react',
   },
   {
@@ -99,7 +100,7 @@ const DOCS = [
   {
     href: '#top', section: ['Início', 'Home'],
     title: ['Natal, RN', 'Natal, Brazil'],
-    text: ['Natal, Rio Grande do Norte, Brasil — a Cidade do Sol. Fuso horário UTC−3.', 'Natal, Rio Grande do Norte, Brazil — the City of the Sun. Time zone UTC−3.'],
+    text: ['Natal, Rio Grande do Norte, Brasil, conhecida como Cidade do Sol. Fuso horário UTC−3.', 'Natal, Rio Grande do Norte, Brazil, known as the City of the Sun. Time zone UTC−3.'],
     keywords: 'onde where localizacao location cidade city mora lives brasil brazil fuso timezone horario',
   },
   {
@@ -129,7 +130,7 @@ const DOCS = [
   {
     href: '#top', section: ['Início', 'Home'],
     title: ['O céu no topo da página', 'The sky at the top'],
-    text: ['O sol e a lua no topo estão na posição real sobre Natal agora. Use o controle de hora ou o timelapse para ver o dia passar.', 'The sun and moon at the top are where they really are over Natal right now. Use the time slider or the timelapse to watch the day go by.'],
+    text: ['O sol e a lua no topo seguem a posição real sobre Natal. O controle de hora e o timelapse percorrem o dia.', 'The sun and moon at the top follow their real position over Natal. The time slider and the timelapse move through the day.'],
     keywords: 'sol sun lua moon ceu sky ascii hora time timelapse astronomia astronomy',
   },
   {
@@ -217,7 +218,7 @@ const index = new BM25(
 
 function highlight(text, matched) {
   return text
-    .split(/(\s+|[.,;:—()]+)/)
+    .split(/(\s+|[.,;:()]+)/)
     .map((part) => {
       const token = stem(normalize(part).replace(/[^a-z0-9µ#+]/g, ''));
       return token && matched.has(token) ? `<mark>${escapeHtml(part)}</mark>` : escapeHtml(part);
@@ -240,14 +241,14 @@ const skyAction = (name) => () => go('#top', () => skyControl[name]?.());
 const COMMANDS = [
   { group: 'go', icon: 'i-sun', title: ['Início', 'Home'], keywords: 'topo top hero inicio home', run: () => go('#top') },
   { group: 'go', icon: 'i-hash', title: ['Sobre', 'About'], keywords: 'sobre about manifesto quem who', run: () => go('#sobre') },
-  { group: 'go', icon: 'i-doc', title: ['Trabalho — dossiês sob sigilo', 'Work — confidential files'], keywords: 'trabalho work pgm amentoria experiencia experience', run: () => go('#trabalho') },
+  { group: 'go', icon: 'i-doc', title: ['Trabalho: dossiês sob sigilo', 'Work: confidential files'], keywords: 'trabalho work pgm amentoria experiencia experience', run: () => go('#trabalho') },
   {
-    group: 'go', icon: 'i-terminal', title: ['ShellShield — testar no terminal', 'ShellShield — try it in the terminal'], keywords: 'shellshield terminal demo seguranca security',
+    group: 'go', icon: 'i-terminal', title: ['ShellShield: testar no terminal', 'ShellShield: try it in the terminal'], keywords: 'shellshield terminal demo seguranca security',
     run: () => go('#shellshield', () => $('#shellshield .term-input')?.focus({ preventScroll: true })),
   },
-  { group: 'go', icon: 'i-terminal', title: ['ibx — simulador de sandboxes', 'ibx — sandbox simulator'], keywords: 'ibx sandbox agentes agents instabox', run: () => go('#ibx') },
-  { group: 'go', icon: 'i-hash', title: ['Stack — espaço latente', 'Stack — latent space'], keywords: 'stack tecnologias technologies ferramentas tools skills', run: () => go('#stack') },
-  { group: 'go', icon: 'i-bolt', title: ['Este site — telemetria ao vivo', 'This site — live telemetry'], keywords: 'site telemetria telemetry performance colofao colophon', run: () => go('#este-site') },
+  { group: 'go', icon: 'i-terminal', title: ['ibx: simulador de sandboxes', 'ibx: sandbox simulator'], keywords: 'ibx sandbox agentes agents instabox', run: () => go('#ibx') },
+  { group: 'go', icon: 'i-hash', title: ['Stack: mapa de ferramentas', 'Stack: map of tools'], keywords: 'stack tecnologias technologies ferramentas tools skills', run: () => go('#stack') },
+  { group: 'go', icon: 'i-bolt', title: ['Este site: telemetria ao vivo', 'This site: live telemetry'], keywords: 'site telemetria telemetry performance colofao colophon', run: () => go('#este-site') },
   { group: 'go', icon: 'i-link', title: ['Contato', 'Contact'], keywords: 'contato contact falar talk', run: () => go('#contato') },
 
   { group: 'act', icon: 'i-theme', title: ['Alternar tema claro / escuro', 'Toggle light / dark theme'], keywords: 'tema theme dark light escuro claro modo mode', run: () => toggleTheme() },
@@ -268,12 +269,18 @@ const COMMANDS = [
       }
     },
   },
+  {
+    group: 'act', icon: 'i-pause', title: () => (isStill() ? ['Retomar animações', 'Resume animations'] : ['Pausar animações', 'Pause animations']),
+    keywords: 'pausar pause animacao animation movimento motion parar stop retomar resume', run: () => toggleStill(),
+  },
   { group: 'act', icon: 'i-print', title: ['Imprimir como currículo', 'Print as a résumé'], keywords: 'imprimir print cv curriculo resume pdf', run: () => setTimeout(() => print(), 250) },
 
   { group: 'link', icon: 'i-linkedin', title: ['LinkedIn', 'LinkedIn'], sub: '/in/riquelme-soares', keywords: 'linkedin contato contact', run: () => open('https://www.linkedin.com/in/riquelme-soares/', '_blank', 'noopener') },
   { group: 'link', icon: 'i-github', title: ['GitHub', 'GitHub'], sub: '@hevlyo', keywords: 'github codigo code repositorios repositories', run: () => open('https://github.com/hevlyo', '_blank', 'noopener') },
   { group: 'link', icon: 'i-github', title: ['Código-fonte deste site', 'This site’s source code'], sub: 'hevlyo/hevlyo.github.io', keywords: 'source codigo fonte site', run: () => open('https://github.com/hevlyo/hevlyo.github.io', '_blank', 'noopener') },
 ];
+
+const titleOf = (cmd) => pick(typeof cmd.title === 'function' ? cmd.title() : cmd.title);
 
 const GROUPS = {
   answers: ['Respostas · BM25', 'Answers · BM25'],
@@ -335,7 +342,7 @@ export function initPalette() {
           }),
         });
       }
-      const ranked = COMMANDS.map((cmd) => ({ cmd, score: Math.max(fuzzy(query, pick(cmd.title)), fuzzy(query, cmd.keywords) * 0.8) }))
+      const ranked = COMMANDS.map((cmd) => ({ cmd, score: Math.max(fuzzy(query, titleOf(cmd)), fuzzy(query, cmd.keywords) * 0.8) }))
         .filter((r) => r.score > 4)
         .sort((a, b) => b.score - a.score)
         .slice(0, 7);
@@ -389,7 +396,7 @@ export function initPalette() {
   }
 
   function toEntry(cmd) {
-    return { icon: cmd.icon, titleHtml: escapeHtml(pick(cmd.title)), sub: cmd.sub, run: cmd.run };
+    return { icon: cmd.icon, titleHtml: escapeHtml(titleOf(cmd)), sub: cmd.sub, run: cmd.run };
   }
 
   function select(position, scroll = true) {
@@ -441,6 +448,7 @@ export function initPalette() {
   });
 
   document.querySelectorAll('[data-palette-open]').forEach((button) => button.addEventListener('click', openPalette));
+  $('[data-palette-close]', dialog)?.addEventListener('click', close);
   addEventListener('keydown', (event) => {
     const typing = event.target instanceof Element && event.target.closest('input, textarea, [contenteditable]');
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
@@ -453,7 +461,5 @@ export function initPalette() {
   });
   onLang(() => dialog.open && render());
 
-  // Shown in tooltips/aria for discoverability.
-  const shortcut = isMac ? '⌘K' : 'Ctrl+K';
-  document.querySelectorAll('[data-palette-open]').forEach((button) => button.setAttribute('aria-keyshortcuts', shortcut === '⌘K' ? 'Meta+K' : 'Control+K'));
+  document.querySelectorAll('[data-palette-open]').forEach((button) => button.setAttribute('aria-keyshortcuts', isMac ? 'Meta+K' : 'Control+K'));
 }

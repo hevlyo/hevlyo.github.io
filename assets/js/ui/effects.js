@@ -1,4 +1,5 @@
 import { $, $$, h, clamp, reducedMotion } from '../core/util.js';
+import { calm } from '../core/motion.js';
 import { pick, onLang } from '../core/i18n.js';
 
 /* ---------- Text scramble ---------- */
@@ -8,7 +9,7 @@ const running = new Map();
 
 export function scramble(element, finalText, { duration = 480, chars = GLYPHS } = {}) {
   cancelAnimationFrame(running.get(element));
-  if (reducedMotion.matches) {
+  if (calm()) {
     element.textContent = finalText;
     return;
   }
@@ -44,7 +45,6 @@ export function initScramble() {
       scramble(element, element.textContent, { duration: 420 });
     };
     element.addEventListener('pointerenter', run);
-    element.addEventListener('focus', run);
   }
   onLang(cancelAllScrambles);
 }
@@ -115,9 +115,7 @@ export function initWords() {
       }
       const rect = element.getBoundingClientRect();
       const vh = innerHeight;
-      const startLine = vh * 0.82;
-      const endLine = vh * 0.42;
-      const progress = clamp((startLine - rect.top) / (startLine - endLine + rect.height), 0, 1);
+      const progress = clamp((vh * 0.85 - rect.top) / (rect.height + vh * 0.15), 0, 1);
       const next = Math.round(progress * words.length);
       if (next === lit) return;
       words.forEach((word, i) => word.classList.toggle('is-lit', i < next));

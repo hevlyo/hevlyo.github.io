@@ -1,11 +1,11 @@
 # hevlyo.github.io
 
-Portfólio de **Riquelme Soares** — Full-Stack & AI Engineer em Natal, RN.
+Portfólio de **Riquelme Soares**, Full-Stack & AI Engineer em Natal, RN.
 → **[hevlyo.github.io](https://hevlyo.github.io)**
 
 ![O céu de Natal desenhado em ASCII](assets/img/og.png)
 
-Feito à mão: HTML, CSS e JavaScript puros. Sem framework, sem etapa de build, sem dependências, sem rastreadores.
+HTML, CSS e JavaScript escritos à mão, sem framework, etapa de build, dependências ou rastreadores.
 
 ## O que tem aqui
 

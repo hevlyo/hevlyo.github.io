@@ -19,8 +19,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Riquelme Soares — Full-Stack &amp; AI Engineer · Natal, RN</title>
-  <meta name="description" content="Riquelme Soares, engenheiro full-stack e de IA em Natal/RN. LLMs, agentes de IA, RAG, NestJS, Kafka, FastAPI e Python: sistemas que funcionam sozinhos.">
+  <title>Riquelme Soares · Full-Stack &amp; AI Engineer · Natal, RN</title>
+  <meta name="description" content="Riquelme Soares, engenheiro full-stack e de IA em Natal, RN. Trabalha com LLMs, agentes de IA, RAG, NestJS, Kafka, FastAPI e Python.">
   <meta name="author" content="Riquelme Soares">
   <meta name="color-scheme" content="dark light">
   <meta name="theme-color" content="#0b0a09">
@@ -34,12 +34,12 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://hevlyo.github.io/">
   <meta property="og:site_name" content="Riquelme Soares">
-  <meta property="og:title" content="Riquelme Soares — Full-Stack &amp; AI Engineer">
-  <meta property="og:description" content="Sistemas que funcionam sozinhos: LLMs, agentes de IA, RAG, NestJS, Kafka e FastAPI. Natal, RN.">
+  <meta property="og:title" content="Riquelme Soares · Full-Stack &amp; AI Engineer">
+  <meta property="og:description" content="Engenheiro full-stack e de IA em Natal, RN. LLMs, agentes de IA, RAG, NestJS, Kafka e FastAPI.">
   <meta property="og:image" content="https://hevlyo.github.io/assets/img/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Riquelme Soares — o sol de Natal desenhado em caracteres ASCII.">
+  <meta property="og:image:alt" content="Riquelme Soares e o sol de Natal desenhado em caracteres ASCII.">
   <meta property="og:locale" content="pt_BR">
   <meta property="og:locale:alternate" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
@@ -65,6 +65,7 @@
         }
         d.dataset.lang = lang;
         d.lang = lang === 'en' ? 'en' : 'pt-BR';
+        if (localStorage.getItem('motion') === 'still') d.classList.add('is-still');
       } catch (e) {}
     })();
   </script>
@@ -106,6 +107,7 @@
     <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
     <symbol id="i-lang" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 12h17M12 3.5c2.4 2.5 3.5 5.3 3.5 8.5s-1.1 6-3.5 8.5c-2.4-2.5-3.5-5.3-3.5-8.5s1.1-6 3.5-8.5z" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
     <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m7 9.5 3 2.5-3 2.5M12.5 15h4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m6.5 6.5 11 11m0-11-11 11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
     <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V3.5h10V9M7 17H4.5V10.5a1.5 1.5 0 0 1 1.5-1.5h12a1.5 1.5 0 0 1 1.5 1.5V17H17M7 14h10v6.5H7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
   </svg>
 
@@ -113,7 +115,7 @@
   <div class="cursor" aria-hidden="true"><span class="cursor-ring"></span><span class="cursor-label"></span></div>
 
   <header class="topbar" data-topbar>
-    <a class="brand" href="#top" aria-label="Riquelme Soares — início" data-i18n-attr="aria-label:ui.home">
+    <a class="brand" href="#top" aria-label="Riquelme Soares, início" data-i18n-attr="aria-label:ui.home">
       <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
         <defs><clipPath id="brand-clip"><rect x="0" y="0" width="32" height="18.4"/></clipPath></defs>
         <circle class="brand-sun" cx="16" cy="18" r="8.6" clip-path="url(#brand-clip)"/>
@@ -133,9 +135,11 @@
     </nav>
 
     <div class="controls">
-      <button class="ctl ctl--palette" type="button" data-palette-open aria-label="Abrir a paleta de comandos" data-i18n-attr="aria-label:ui.paletteOpen">
+      <button class="ctl ctl--palette" type="button" data-palette-open>
         <svg class="i" aria-hidden="true"><use href="#i-search"/></svg>
+        <span class="ctl-label">Menu</span>
         <kbd data-kbd>⌘K</kbd>
+        <span class="sr-only" data-i18n="ui.paletteOpen">Abrir a paleta de comandos</span>
       </button>
       <button class="ctl ctl--lang" type="button" data-lang-toggle aria-label="Switch to English" data-i18n-attr="aria-label:ui.langToggle">
         <span data-lang-opt="pt">PT</span><span class="ctl-sep" aria-hidden="true">/</span><span data-lang-opt="en">EN</span>
@@ -158,21 +162,21 @@
       <div class="hero-inner wrap">
         <p class="eyebrow" data-intro>
           <span class="pulse" aria-hidden="true"></span>
-          <span data-i18n="hero.eyebrow">Full-Stack &amp; AI Engineer — Natal, RN, Brasil</span>
+          <span data-i18n="hero.eyebrow">Full-Stack &amp; AI Engineer · Natal, RN, Brasil</span>
         </p>
         <h1 class="hero-title" id="hero-title">
           <span class="sr-only">Riquelme Soares</span>
           <span class="hero-line" data-split aria-hidden="true">Riquelme</span>
           <span class="hero-line hero-line--italic" data-split aria-hidden="true">Soares</span>
         </h1>
-        <p class="hero-lede" data-intro data-i18n="hero.lede">Transformo processos manuais em <em>sistemas que funcionam sozinhos</em> — APIs, arquiteturas orientadas a eventos, LLMs e agentes de IA em produção.</p>
+        <p class="hero-lede" data-intro data-i18n="hero.lede">Transformo processos manuais em <em>sistemas que funcionam sozinhos</em>, de APIs e arquiteturas orientadas a eventos até integrações com LLMs e agentes de IA.</p>
         <div class="hero-cta" data-intro>
           <a class="btn btn--solid" href="#trabalho" data-magnetic>
             <span data-i18n="hero.cta1">Ver o trabalho</span>
             <svg class="i" aria-hidden="true"><use href="#i-arrow-down"/></svg>
           </a>
           <button class="btn btn--ghost" type="button" data-palette-open data-magnetic>
-            <span data-i18n="hero.cta2">Pergunte ao portfólio</span>
+            <span data-i18n="hero.cta2">Buscar no site</span>
             <kbd data-kbd>⌘K</kbd>
           </button>
         </div>
@@ -185,9 +189,9 @@
         </div>
         <dl class="sp-grid">
           <div><dt data-i18n="sky.time">Hora local</dt><dd data-sky="time">--:--</dd></div>
-          <div><dt data-sky="bodyLabel">Sol</dt><dd data-sky="body">—</dd></div>
-          <div><dt data-i18n="sky.sun">Nascer · pôr</dt><dd data-sky="sunTimes">—</dd></div>
-          <div><dt data-i18n="sky.moon">Fase da lua</dt><dd data-sky="moon">—</dd></div>
+          <div><dt data-sky="bodyLabel">Sol</dt><dd data-sky="body">…</dd></div>
+          <div><dt data-i18n="sky.sun">Nascer · pôr</dt><dd data-sky="sunTimes">…</dd></div>
+          <div><dt data-i18n="sky.moon">Fase da lua</dt><dd data-sky="moon">…</dd></div>
         </dl>
         <div class="sp-scrub">
           <div class="sp-track" data-sky-track aria-hidden="true"></div>
@@ -219,7 +223,7 @@
         </header>
 
         <div class="about-grid">
-        <p class="manifesto" data-words data-i18n="about.manifesto">Sou engenheiro full-stack e de IA em Natal. Pego processos que dependem de gente copiando, colando e conferindo — e transformo em <em>sistemas que funcionam sozinhos</em>: do endpoint à fila de eventos, do modelo ao agente de IA em produção.</p>
+        <p class="manifesto" data-words data-i18n="about.manifesto">Sou engenheiro full-stack e de IA em Natal. Automatizo processos que ainda dependem de gente copiando, colando e conferindo, usando APIs, filas de eventos, modelos de machine learning e <em>agentes de IA em produção</em>.</p>
 
         <dl class="facts">
           <div class="fact" data-reveal>
@@ -232,7 +236,7 @@
           </div>
           <div class="fact" data-reveal>
             <dt data-i18n="about.f3k">Formação</dt>
-            <dd data-i18n="about.f3v">Ciência e Tecnologia — UFRN</dd>
+            <dd data-i18n="about.f3v">Ciência e Tecnologia, UFRN</dd>
           </div>
           <div class="fact" data-reveal>
             <dt data-i18n="about.f4k">Aberto a</dt>
@@ -253,8 +257,8 @@
         </header>
 
         <div class="split">
-          <h2 class="display" id="work-title" data-reveal data-i18n="work.title">O trabalho que mais importa <em>não está no GitHub.</em></h2>
-          <p class="lead" data-reveal data-i18n="work.lead">Ele roda dentro de instituições e lida com dados sensíveis — por segurança, o código é privado. Aqui está o que dá para mostrar. O resto eu conto numa conversa.</p>
+          <h2 class="display" id="work-title" data-reveal data-i18n="work.title">Meu trabalho principal <em>não está no GitHub.</em></h2>
+          <p class="lead" data-reveal data-i18n="work.lead">Ele roda dentro de instituições e lida com dados sensíveis, então o código é privado por segurança. Abaixo está o que posso mostrar. Os detalhes ficam para uma conversa.</p>
         </div>
 
         <div class="dossiers">
@@ -266,17 +270,19 @@
             </header>
             <h3 class="dossier-org" id="d1-org">PGM Natal</h3>
             <p class="dossier-full" data-i18n="work.d1.full">Procuradoria Geral do Município de Natal</p>
-            <p class="dossier-desc" data-i18n="work.d1.desc">Desenvolvo soluções com FastAPI, PostgreSQL e Machine Learning — automação e IA aplicadas ao dia a dia jurídico do município.</p>
+            <p class="dossier-desc" data-i18n="work.d1.desc">Desenvolvo soluções com FastAPI, PostgreSQL e Machine Learning para a Procuradoria Geral do Município.</p>
             <div class="redacted" role="group" aria-label="Detalhes sob sigilo" data-i18n-attr="aria-label:work.redacted">
               <div class="r-line"><span class="r-key" data-i18n="work.k.scope">escopo</span><span class="r-bar" data-redact style="--w:82%"></span></div>
               <div class="r-line"><span class="r-key" data-i18n="work.k.data">dados</span><span class="r-bar" data-redact style="--w:58%"></span></div>
               <div class="r-line"><span class="r-key" data-i18n="work.k.arch">arquitetura</span><span class="r-bar" data-redact style="--w:70%"></span></div>
               <div class="r-line"><span class="r-key" data-i18n="work.k.impact">impacto</span><span class="r-bar" data-redact style="--w:46%"></span></div>
             </div>
-            <ul class="tags" aria-label="Stack">
-              <li>Python</li><li>FastAPI</li><li>PostgreSQL</li><li>Machine Learning</li>
-            </ul>
-            <span class="stamp" aria-hidden="true" data-i18n="work.stamp1">Sigiloso</span>
+            <div class="dossier-foot">
+              <ul class="tags" aria-label="Stack">
+                <li>Python</li><li>FastAPI</li><li>PostgreSQL</li><li>Machine Learning</li>
+              </ul>
+              <span class="stamp" aria-hidden="true" data-i18n="work.stamp1">Sigiloso</span>
+            </div>
           </article>
 
           <article class="dossier" data-reveal aria-labelledby="d2-org">
@@ -287,22 +293,24 @@
             </header>
             <h3 class="dossier-org" id="d2-org">AMentoria</h3>
             <p class="dossier-full" data-i18n="work.d2.full">AMentoria Educação</p>
-            <p class="dossier-desc" data-i18n="work.d2.desc">Construo microsserviços com NestJS, GraphQL e Apache Kafka — serviços desacoplados que conversam por eventos.</p>
+            <p class="dossier-desc" data-i18n="work.d2.desc">Construo microsserviços com NestJS, GraphQL e Apache Kafka, numa arquitetura orientada a eventos.</p>
             <div class="redacted" role="group" aria-label="Detalhes sob sigilo" data-i18n-attr="aria-label:work.redacted">
               <div class="r-line"><span class="r-key" data-i18n="work.k.services">serviços</span><span class="r-bar" data-redact style="--w:64%"></span></div>
               <div class="r-line"><span class="r-key" data-i18n="work.k.topics">tópicos</span><span class="r-bar" data-redact style="--w:76%"></span></div>
               <div class="r-line"><span class="r-key" data-i18n="work.k.arch">arquitetura</span><span class="r-bar" data-redact style="--w:52%"></span></div>
               <div class="r-line"><span class="r-key" data-i18n="work.k.impact">impacto</span><span class="r-bar" data-redact style="--w:68%"></span></div>
             </div>
-            <ul class="tags" aria-label="Stack">
-              <li>NestJS</li><li>GraphQL</li><li>Apache Kafka</li><li>TypeScript</li>
-            </ul>
-            <span class="stamp stamp--alt" aria-hidden="true" data-i18n="work.stamp2">Confidencial</span>
+            <div class="dossier-foot">
+              <ul class="tags" aria-label="Stack">
+                <li>NestJS</li><li>GraphQL</li><li>Apache Kafka</li><li>TypeScript</li>
+              </ul>
+              <span class="stamp stamp--alt" aria-hidden="true" data-i18n="work.stamp2">Confidencial</span>
+            </div>
           </article>
         </div>
 
         <p class="work-cta" data-reveal>
-          <span data-i18n="work.note">Posso detalhar arquitetura, decisões e resultados — sem quebrar nenhum sigilo.</span>
+          <span data-i18n="work.note">Numa conversa, posso detalhar arquitetura, decisões e resultados sem quebrar o sigilo.</span>
           <a class="link-arrow" href="#contato"><span data-i18n="work.cta">Vamos conversar</span><svg class="i" aria-hidden="true"><use href="#i-arrow-ne"/></svg></a>
         </p>
       </div>
@@ -318,19 +326,19 @@
         </header>
 
         <div class="split">
-          <h2 class="display" id="oss-title" data-reveal data-i18n="oss.title">Ferramentas para a <em>era dos agentes.</em></h2>
-          <p class="lead" data-reveal data-i18n="oss.lead">Duas ferramentas abertas para quem coloca agentes de IA para trabalhar no terminal. Nada de screenshot: as demos abaixo rodam no seu navegador.</p>
+          <h2 class="display" id="oss-title" data-reveal data-i18n="oss.title">Ferramentas para trabalhar com <em>agentes de IA.</em></h2>
+          <p class="lead" data-reveal data-i18n="oss.lead">Duas ferramentas de código aberto para quem coloca agentes de IA para trabalhar no terminal. As demos abaixo rodam no seu navegador.</p>
         </div>
 
         <article class="project" id="shellshield" aria-labelledby="p1-title">
           <div class="project-info" data-reveal>
             <p class="project-kicker"><span class="project-num">P/01</span><span data-i18n="oss.p1.kicker">Segurança · CLI · TypeScript + Bun</span></p>
             <h3 class="project-title" id="p1-title">ShellShield</h3>
-            <p class="project-desc" data-i18n="oss.p1.desc">Segurança de terminal em tempo real para a era do AI coding. Um hook de shell que analisa cada comando com um parser de verdade e bloqueia <code>rm -rf /</code>, armadilhas de <code>curl | bash</code> e ataques de homógrafo antes que executem.</p>
+            <p class="project-desc" data-i18n="oss.p1.desc">Um hook de shell que analisa cada comando com um parser de shell e bloqueia <code>rm -rf /</code>, armadilhas de <code>curl | bash</code> e ataques de homógrafo antes que executem. Feito para terminais onde agentes de IA rodam comandos.</p>
             <dl class="stats">
               <div><dt data-i18n="oss.p1.s1k">por comando</dt><dd data-i18n="oss.p1.s1v">~23,5 µs</dd></div>
               <div><dt data-i18n="oss.p1.s2k">ops/s no benchmark</dt><dd data-i18n="oss.p1.s2v">42.573</dd></div>
-              <div><dt data-i18n="oss.p1.s3k">testes de bypass</dt><dd>117</dd></div>
+              <div><dt data-i18n="oss.p1.s3k">testes automatizados</dt><dd>117</dd></div>
             </dl>
             <ul class="tags" aria-label="Stack"><li>TypeScript</li><li>Bun</li><li>shell-quote</li><li>Zod</li></ul>
             <a class="link-arrow" href="https://github.com/hevlyo/ShellShield" target="_blank" rel="noopener">
@@ -341,7 +349,7 @@
             <div class="artifact" data-artifact="shellshield">
               <p class="artifact-fallback" data-i18n="oss.fallback">Ative o JavaScript para testar a demo interativa.</p>
             </div>
-            <p class="stage-caption" data-i18n="oss.p1.caption">Subconjunto das regras reais, com as mensagens do próprio CLI. Tente <code>rm -rf /</code> — aqui é seguro.</p>
+            <p class="stage-caption" data-i18n="oss.p1.caption">Um subconjunto das regras reais, com as mesmas mensagens do CLI. Pode testar <code>rm -rf /</code>: nada é executado aqui.</p>
           </div>
         </article>
 
@@ -349,7 +357,7 @@
           <div class="project-info" data-reveal>
             <p class="project-kicker"><span class="project-num">P/02</span><span data-i18n="oss.p2.kicker">Agentes de IA · Bash · Sandboxes</span></p>
             <h3 class="project-title" id="p2-title">ibx</h3>
-            <p class="project-desc" data-i18n="oss.p2.desc">Skill de agente + um único script bash para pegar emprestado sandboxes descartáveis do instabox.sh. Reserva sem corrida entre agentes, sobrevive à pausa por ociosidade, nunca repete um exec que pode ter rodado e recusa copiar credenciais. Funciona com Claude Code, Codex e OpenCode.</p>
+            <p class="project-desc" data-i18n="oss.p2.desc">Uma skill de agente com um único script bash para usar sandboxes descartáveis do instabox.sh. Evita que dois agentes peguem a mesma sandbox, lida com a pausa por ociosidade, nunca repete um exec que pode ter rodado e se recusa a copiar credenciais. Funciona com Claude Code, Codex e OpenCode.</p>
             <dl class="stats">
               <div><dt data-i18n="oss.p2.s1k">bash + curl + jq</dt><dd data-i18n="oss.p2.s1v">1 script</dd></div>
               <div><dt data-i18n="oss.p2.s2k">daemons ou SDKs</dt><dd>0</dd></div>
@@ -385,8 +393,8 @@
         </header>
 
         <div class="split">
-          <h2 class="display" id="stack-title" data-reveal data-i18n="stack.title">Um espaço latente <em>de ferramentas.</em></h2>
-          <p class="lead" data-reveal data-i18n="stack.lead">Agrupadas pelo problema que resolvem, como embeddings de verdade. Passe o mouse — ou navegue com Tab — para ver as conexões.</p>
+          <h2 class="display" id="stack-title" data-reveal data-i18n="stack.title">Ferramentas agrupadas <em>pelo que resolvem.</em></h2>
+          <p class="lead" data-reveal data-i18n="stack.lead">Cada grupo reúne ferramentas que costumam aparecer juntas, como num mapa de embeddings. Passe o mouse ou navegue com Tab para ver as conexões.</p>
         </div>
 
         <div class="latent" data-latent data-reveal>
@@ -456,7 +464,11 @@
         </div>
       </div>
 
-      <div class="marquee" aria-label="Princípios de engenharia" data-i18n-attr="aria-label:stack.principles">
+      <div class="marquee" role="group" aria-label="Princípios de engenharia" data-i18n-attr="aria-label:stack.principles">
+        <button class="marquee-toggle" type="button" data-motion-toggle>
+          <svg class="i" aria-hidden="true"><use href="#i-pause"/></svg>
+          <span class="sr-only" data-motion-label>Pausar animações</span>
+        </button>
         <div class="marquee-track" data-marquee>
           <span data-i18n="stack.m1">API Design</span><span class="marquee-star" aria-hidden="true">✦</span>
           <span data-i18n="stack.m2">Arquitetura orientada a eventos</span><span class="marquee-star" aria-hidden="true">✦</span>
@@ -478,8 +490,8 @@
 
         <div class="colophon-grid">
           <div class="colophon-intro">
-            <h2 class="display" id="site-title" data-reveal data-i18n="site.title">Este site <em>é</em> a demonstração.</h2>
-            <p class="lead" data-reveal data-i18n="site.lead">Sem template, sem framework, sem etapa de build. HTML, CSS e JavaScript escritos à mão — e medidos agora, no seu navegador.</p>
+            <h2 class="display" id="site-title" data-reveal data-i18n="site.title">Como este site <em>foi feito.</em></h2>
+            <p class="lead" data-reveal data-i18n="site.lead">HTML, CSS e JavaScript escritos à mão, sem template, framework ou etapa de build. Os números desta seção são medidos agora, no seu navegador.</p>
             <a class="link-arrow" data-reveal href="https://github.com/hevlyo/hevlyo.github.io" target="_blank" rel="noopener">
               <span data-i18n="site.source">Ler o código-fonte</span><svg class="i" aria-hidden="true"><use href="#i-arrow-ne"/></svg>
             </a>
@@ -491,12 +503,12 @@
               <span class="tm-live"><i aria-hidden="true"></i><span data-i18n="site.live">medido agora</span></span>
             </figcaption>
             <dl class="tm-grid">
-              <div><dt data-i18n="site.t.weight">Peso transferido</dt><dd data-tm="weight">—</dd></div>
-              <div><dt data-i18n="site.t.requests">Requisições</dt><dd data-tm="requests">—</dd></div>
-              <div><dt data-i18n="site.t.ready">Pronto em</dt><dd data-tm="ready">—</dd></div>
-              <div><dt data-i18n="site.t.fps">Céu em WebGL</dt><dd data-tm="fps">—</dd></div>
-              <div><dt data-i18n="site.t.glyphs">Glifos por quadro</dt><dd data-tm="glyphs">—</dd></div>
-              <div><dt data-i18n="site.t.dom">Elementos no DOM</dt><dd data-tm="dom">—</dd></div>
+              <div><dt data-i18n="site.t.weight">Peso transferido</dt><dd data-tm="weight">…</dd></div>
+              <div><dt data-i18n="site.t.requests">Requisições</dt><dd data-tm="requests">…</dd></div>
+              <div><dt data-i18n="site.t.ready">Pronto em</dt><dd data-tm="ready">…</dd></div>
+              <div><dt data-i18n="site.t.fps">Céu em WebGL</dt><dd data-tm="fps">…</dd></div>
+              <div><dt data-i18n="site.t.glyphs">Glifos por quadro</dt><dd data-tm="glyphs">…</dd></div>
+              <div><dt data-i18n="site.t.dom">Elementos no DOM</dt><dd data-tm="dom">…</dd></div>
               <div><dt data-i18n="site.t.deps">Dependências</dt><dd>0</dd></div>
               <div><dt data-i18n="site.t.trackers">Rastreadores</dt><dd>0</dd></div>
             </dl>
@@ -507,32 +519,32 @@
           <li class="feature" data-reveal>
             <span class="feature-n" aria-hidden="true">a</span>
             <h3 data-i18n="site.f1.t">Céu em tempo real</h3>
-            <p data-i18n="site.f1.d">O sol e a lua lá em cima estão onde estão agora sobre Natal: altura, nascer, pôr, fase e até a inclinação do crescente, calculados no seu navegador.</p>
+            <p data-i18n="site.f1.d">O sol e a lua do topo da página seguem a posição real sobre Natal. Altura, nascer, pôr, fase e inclinação da lua são calculados no seu navegador.</p>
           </li>
           <li class="feature" data-reveal>
             <span class="feature-n" aria-hidden="true">b</span>
             <h3 data-i18n="site.f2.t">ASCII em WebGL</h3>
-            <p data-i18n="site.f2.d">Um renderizador de duas passadas: a cena vira uma grade de células, e cada célula vira um glifo, ordenado pela densidade de tinta medida na hora.</p>
+            <p data-i18n="site.f2.d">A cena é desenhada numa grade de células e cada célula vira um caractere, escolhido pela densidade de tinta medida quando a página carrega. São duas passadas de shader.</p>
           </li>
           <li class="feature" data-reveal>
             <span class="feature-n" aria-hidden="true">c</span>
             <h3 data-i18n="site.f3.t">Busca com BM25</h3>
-            <p data-i18n="site.f3.d">A paleta <kbd data-kbd>⌘K</kbd> recupera trechos deste site com BM25 — o “R” do RAG, sem servidor e sem enviar nada a ninguém.</p>
+            <p data-i18n="site.f3.d">A paleta <kbd data-kbd>⌘K</kbd> busca trechos deste site com BM25, a mesma etapa de recuperação de um RAG. Roda sem servidor e nada sai do navegador.</p>
           </li>
           <li class="feature" data-reveal>
             <span class="feature-n" aria-hidden="true">d</span>
-            <h3 data-i18n="site.f4.t">Acessível de verdade</h3>
-            <p data-i18n="site.f4.d">HTML semântico, navegação completa por teclado, contraste AA e respeito a quem prefere menos movimento.</p>
+            <h3 data-i18n="site.f4.t">Acessibilidade</h3>
+            <p data-i18n="site.f4.d">HTML semântico, navegação completa por teclado, contraste AA e suporte a quem prefere menos movimento.</p>
           </li>
           <li class="feature" data-reveal>
             <span class="feature-n" aria-hidden="true">e</span>
-            <h3 data-i18n="site.f5.t">Dois idiomas, dois céus</h3>
-            <p data-i18n="site.f5.d">Português e inglês, tema claro e escuro — tudo troca sem recarregar a página.</p>
+            <h3 data-i18n="site.f5.t">Idioma e tema</h3>
+            <p data-i18n="site.f5.d">Português ou inglês, tema claro ou escuro. Tudo troca sem recarregar a página.</p>
           </li>
           <li class="feature" data-reveal>
             <span class="feature-n" aria-hidden="true">f</span>
-            <h3 data-i18n="site.f6.t">Zero rastreadores</h3>
-            <p data-i18n="site.f6.d">Nenhum analytics, cookie ou requisição a terceiros. Até as fontes são servidas daqui.</p>
+            <h3 data-i18n="site.f6.t">Sem rastreadores</h3>
+            <p data-i18n="site.f6.d">Sem analytics, cookies ou requisições a terceiros. As fontes também são servidas daqui.</p>
           </li>
         </ol>
       </div>
@@ -547,8 +559,8 @@
           <span class="section-rule" aria-hidden="true"></span>
         </header>
 
-        <h2 class="contact-title" id="contact-title" data-reveal data-i18n="contact.title">Vamos construir algo que <em>funcione sozinho?</em></h2>
-        <p class="lead contact-lead" data-reveal data-i18n="contact.lead">Aberto a projetos freelance e vagas remotas em IA, backend e automação. A conversa começa no LinkedIn.</p>
+        <h2 class="contact-title" id="contact-title" data-reveal data-i18n="contact.title">Tem um processo que deveria <em>funcionar sozinho?</em></h2>
+        <p class="lead contact-lead" data-reveal data-i18n="contact.lead">Estou aberto a projetos freelance e vagas remotas em IA, backend e automação. O melhor canal é o LinkedIn.</p>
 
         <div class="contact-links" data-reveal>
           <a class="contact-link" href="https://www.linkedin.com/in/riquelme-soares/" target="_blank" rel="noopener me">
@@ -571,8 +583,8 @@
   <footer class="footer">
     <div class="wrap footer-row">
       <span>© <span data-year>2026</span> Riquelme Soares</span>
-      <span data-i18n="footer.made">Feito à mão em Natal, debaixo do sol.</span>
-      <span class="footer-clock"><span data-i18n="footer.local">Em Natal agora</span> <time data-clock>--:--</time></span>
+      <span data-i18n="footer.made">Feito em Natal, RN.</span>
+      <span class="footer-clock"><span data-i18n="footer.local">Hora em Natal</span> <time data-clock>--:--</time></span>
       <a class="to-top" href="#top"><span data-i18n="footer.top">Voltar ao topo</span><svg class="i" aria-hidden="true"><use href="#i-arrow-up"/></svg></a>
     </div>
     <p class="footer-mark" aria-hidden="true">Riquelme Soares</p>
@@ -582,14 +594,17 @@
     <div class="palette-box">
       <div class="palette-search">
         <svg class="i" aria-hidden="true"><use href="#i-search"/></svg>
-        <input type="text" data-palette-input autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-autocomplete="list" aria-controls="palette-list" placeholder="Pergunte algo ou digite um comando…" aria-label="Pergunte algo ou digite um comando" data-i18n-attr="placeholder:palette.placeholder;aria-label:palette.placeholder">
-        <kbd>esc</kbd>
+        <input type="text" data-palette-input autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-autocomplete="list" aria-controls="palette-list" placeholder="Buscar no site…" aria-label="Busque no site ou digite um comando" data-i18n-attr="placeholder:palette.placeholder;aria-label:palette.inputLabel">
+        <button class="palette-close" type="button" data-palette-close aria-label="Fechar" data-i18n-attr="aria-label:palette.close">
+          <kbd class="pc-key" aria-hidden="true">esc</kbd>
+          <svg class="i pc-x" aria-hidden="true"><use href="#i-x"/></svg>
+        </button>
       </div>
-      <div class="palette-list" id="palette-list" role="listbox" data-palette-list></div>
+      <div class="palette-list" id="palette-list" role="listbox" tabindex="-1" data-palette-list></div>
       <footer class="palette-foot">
         <span><kbd>↑</kbd><kbd>↓</kbd> <span data-i18n="palette.nav">navegar</span></span>
         <span><kbd>↵</kbd> <span data-i18n="palette.open">abrir</span></span>
-        <span class="palette-note" data-i18n="palette.note">BM25 local — nada sai do seu navegador</span>
+        <span class="palette-note" data-i18n="palette.note">Busca BM25 local. Nada sai do seu navegador.</span>
       </footer>
     </div>
   </dialog>

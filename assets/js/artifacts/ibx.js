@@ -1,6 +1,7 @@
 // A scripted simulation of the failure modes ibx (github.com/hevlyo/ibx) exists to handle.
 
-import { h, reducedMotion, watchVisibility } from '../core/util.js';
+import { h, watchVisibility } from '../core/util.js';
+import { calm } from '../core/motion.js';
 import { pick, onLang } from '../core/i18n.js';
 
 const BOXES = ['box-1', 'box-2', 'box-3', 'box-4'];
@@ -40,7 +41,7 @@ const SCENARIOS = [
       [800, 'ibx', ['box-2 parece livre para os dois', 'box-2 looks free to both'], { 'box-2': ['contended', 'agent-a ⇄ agent-b'] }],
       [800, 'ibx', ['os dois gravam uma reserva com token aleatório (7f3a… / c41e…)', 'both write a reservation with a random token (7f3a… / c41e…)']],
       [900, 'ibx', ['espera escritores concorrentes e confere o token duas vezes', 'waits out concurrent writers and checks the token twice']],
-      [900, 'a', ['box-2 ✓ token confere — é minha', 'box-2 ✓ token matches — it’s mine'], { 'box-2': ['held', 'agent-a · tests', 1] }],
+      [900, 'a', ['box-2 ✓ token confere, é minha', 'box-2 ✓ token matches, it’s mine'], { 'box-2': ['held', 'agent-a · tests', 1] }],
       [500, 'b', ['box-2 ✕ token não confere → próxima', 'box-2 ✕ token mismatch → next one']],
       [800, 'b', 'box-3', { 'box-3': ['held', 'agent-b · docker', 1] }],
       [700, 'ok', ['ninguém trabalha em cima de ninguém.', 'nobody works on top of anybody.']],
@@ -58,7 +59,7 @@ const SCENARIOS = [
       [900, 'ibx', ['box-2 não está rodando → retomando antes do exec', 'box-2 isn’t running → resuming before the exec'], { 'box-2': ['running', 'agent-a · build', 1] }],
       [1000, 'warn', ['box-2 voltou de um boot novo: processos anteriores se foram', 'box-2 came back from a fresh boot: earlier processes are gone']],
       [800, 'out', 'index.js  index.js.map', { 'box-2': ['held', 'agent-a · build', 1] }],
-      [700, 'ok', ['a pausa não derrubou o agente — e ele foi avisado.', 'the pause didn’t sink the agent — and it was told.']],
+      [700, 'ok', ['a pausa não derrubou o agente, e ele foi avisado.', 'the pause didn’t sink the agent, and it was warned.']],
     ],
   },
   {
@@ -71,7 +72,7 @@ const SCENARIOS = [
       [900, 'a', ['sem retry cego. conferindo o estado primeiro:', 'no blind retry. checking state first:']],
       [700, 'a', '$ ibx exec box-2 -- "npm run db:status"', { 'box-2': ['running', 'agent-a · status', 1] }],
       [1000, 'out', ['migrations: 12 aplicadas · 0 pendentes', 'migrations: 12 applied · 0 pending'], { 'box-2': ['held', 'agent-a · db', 1] }],
-      [700, 'ok', ['a migração rodou uma vez — e só uma.', 'the migration ran once — and only once.']],
+      [700, 'ok', ['a migração rodou exatamente uma vez.', 'the migration ran exactly once.']],
     ],
   },
   {
@@ -104,9 +105,10 @@ export function mount(host) {
 
   const title = h('span', { class: 'win-title' });
   const badge = h('span', { class: 'win-badge' });
-  const tabs = h('div', { class: 'ibx-scenarios', role: 'tablist' });
+  const tabs = h('div', { class: 'ibx-scenarios', role: 'group' });
   const stage = h('div', { class: 'ibx-stage', 'aria-hidden': 'true' });
-  const log = h('div', { class: 'ibx-log', role: 'log', 'aria-live': 'polite', tabindex: '0' });
+  // Quiet for screen readers until the visitor picks a scenario; autoplay should not chatter.
+  const log = h('div', { class: 'ibx-log', role: 'log', 'aria-live': 'off', tabindex: '0' });
   const progress = h('span', {});
   const replay = h('button', { class: 'ibx-replay', type: 'button', html: '<svg class="i" aria-hidden="true"><use href="#i-play"/></svg><span></span>' });
 
@@ -134,7 +136,7 @@ export function mount(host) {
   );
 
   const tabButtons = SCENARIOS.map((scenario, index) => {
-    const button = h('button', { class: 'ibx-tab', type: 'button', role: 'tab', 'aria-selected': 'false', onclick: () => play(index, true) });
+    const button = h('button', { class: 'ibx-tab', type: 'button', 'aria-pressed': 'false', onclick: () => play(index, true) });
     tabs.append(button);
     return button;
   });
@@ -153,7 +155,7 @@ export function mount(host) {
 
   function paintBox(box) {
     box.element.dataset.state = box.state;
-    box.element.querySelector('.ibx-box-owner').textContent = box.owner || '—';
+    box.element.querySelector('.ibx-box-owner').textContent = box.owner || '·';
     box.element.querySelector('.ibx-box-state').textContent = pick(STATES[box.state] || STATES.free);
     box.element.style.setProperty('--lease', box.lease || 0);
   }
@@ -187,19 +189,20 @@ export function mount(host) {
     const mine = ++token;
     current = index;
     const scenario = SCENARIOS[index];
-    tabButtons.forEach((button, i) => button.setAttribute('aria-selected', String(i === index)));
+    tabButtons.forEach((button, i) => button.setAttribute('aria-pressed', String(i === index)));
+    if (manual) log.setAttribute('aria-live', 'polite');
     progress.textContent = `${pick(['cenário', 'scenario'])} ${index + 1}/${SCENARIOS.length}`;
     log.textContent = '';
     for (const name of BOXES) setBox(name, scenario.start[name] || ['free']);
 
     for (const [delay, speaker, text, changes] of scenario.steps) {
-      if (!reducedMotion.matches && !(await wait(delay, mine))) return;
+      if (!calm() && !(await wait(delay, mine))) return;
       if (mine !== token) return;
       line(speaker, text);
       if (changes) for (const [name, value] of Object.entries(changes)) setBox(name, value);
     }
-    if (reducedMotion.matches || manual) return;
-    if (await wait(3200, mine)) play((index + 1) % SCENARIOS.length);
+    if (calm() || manual || index === SCENARIOS.length - 1) return;
+    if (await wait(3200, mine)) play(index + 1);
   }
 
   function syncText() {

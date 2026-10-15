@@ -3,7 +3,7 @@
 //   cell (rgb = colour, a = luminance).
 //   Pass 2 draws every screen pixel by looking up its cell and sampling a glyph
 //   atlas whose characters are sorted by measured ink coverage.
-// Luminance uses alpha 0–0.8; values above 0.82 address dedicated star glyphs.
+// Luminance uses alpha 0 to 0.8; values above 0.82 address dedicated star glyphs.
 
 const VERTEX = `
 attribute vec2 aPos;
@@ -29,6 +29,7 @@ uniform vec3 uGlow;
 uniform vec3 uSea;
 uniform vec3 uMoonCol;
 uniform vec3 uBg;
+uniform vec4 uText[4];
 
 float hash(vec2 p) {
   p = fract(p * vec2(123.34, 456.21));
@@ -60,10 +61,23 @@ void take(inout float lum, inout vec3 col, float l, vec3 c) {
   if (l > lum) { lum = l; col = c; }
 }
 
+// 0 inside the page's text blocks, 1 clear of them, with a soft edge.
+float clearOfText(vec2 p) {
+  float d = 1.0;
+  for (int i = 0; i < 4; i++) {
+    vec4 b = uText[i];
+    if (b.z <= b.x) continue;
+    vec2 q = max(b.xy - p, p - b.zw);
+    d = min(d, max(q.x, q.y));
+  }
+  return smoothstep(0.0, 0.04, d);
+}
+
 void main() {
   vec2 cell = floor(gl_FragCoord.xy);
   vec2 p = ((cell + 0.5) * uCell - 0.5 * uRes) / uRes.y;
   float t = uTime;
+  float keep = clearOfText(p);
 
   // The pointer is a lens: it bulges the scene toward itself.
   vec2 dm = p - uMouse.xy;
@@ -136,7 +150,7 @@ void main() {
       }
     }
 
-    if (star > 0.05 && !onDisc && lum < 0.12) {
+    if (star > 0.05 && !onDisc && lum < 0.12 && keep > 0.5) {
       gl_FragColor = vec4(mix(uBg, uInk, star), 0.85 + 0.06 * floor(clamp(starSize, 0.0, 0.999) * 3.0));
       return;
     }
@@ -167,6 +181,7 @@ void main() {
   if (abs(p.y - uHorizon) * uRes.y / uCell.y < 0.5) take(lum, col, 0.18 + 0.1 * uSky.x, uSea);
 
   lum += lens * 0.16 * noise(cell * 0.7 + t * 4.0);
+  lum *= mix(0.1, 1.0, keep);
   gl_FragColor = vec4(col, clamp(lum, 0.0, 1.0) * 0.8);
 }
 `;
@@ -214,6 +229,7 @@ void main() {
 const CHARSET = [' ', '.', '·', ',', ':', ';', '-', '~', '=', '+', '*', 'x', 'o', 'e', '%', '#', '&', '$', '@'];
 // Appended after the sorted ramp, in this order: dim, medium and bright stars.
 const STARS = ['·', '+', '*'];
+const EMPTY_TEXT = new Float32Array(16);
 
 function compile(gl, type, source) {
   const shader = gl.createShader(type);
@@ -367,6 +383,7 @@ export function createSkyRenderer(canvas) {
     gl.uniform3fv(u.uSea, palette.sea);
     gl.uniform3fv(u.uMoonCol, palette.moon);
     gl.uniform3fv(u.uBg, palette.bg);
+    if (u['uText[0]']) gl.uniform4fv(u['uText[0]'], state.text || EMPTY_TEXT);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);

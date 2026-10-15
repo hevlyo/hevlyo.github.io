@@ -1,6 +1,6 @@
 // Sun and moon ephemerides, condensed from the formulas in Vladimir Agafonkin's
 // SunCalc (BSD-2-Clause) and Aart Ahlers' "Astronomy Answers". Accuracy is
-// well under a degree — plenty for drawing the sky over one city.
+// well under a degree, which is plenty for drawing the sky over one city.
 
 const PI = Math.PI;
 const RAD = PI / 180;

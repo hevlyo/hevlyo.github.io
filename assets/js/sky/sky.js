@@ -1,7 +1,8 @@
 import * as A from './astro.js';
 import { createSkyRenderer } from './renderer.js';
-import { $, $$, clamp, smoothstep, lerp, reducedMotion, finePointer, hexToRgb, watchVisibility } from '../core/util.js';
+import { $, $$, clamp, smoothstep, lerp, reducedMotion, finePointer, hexToRgb, watchVisibility, cssVar } from '../core/util.js';
 import { pick, onLang, lang } from '../core/i18n.js';
+import { calm, onMotion } from '../core/motion.js';
 import { theme, onTheme } from '../ui/theme.js';
 
 const DAY_MS = 86400000;
@@ -73,14 +74,14 @@ export function initSky() {
   const clock = { mode: 'live', sim: Date.now(), tween: null, playing: false };
   let day = null;
   let astro = null;
-  let layout = { horizon: -0.2, baseX: 0.45, r: 0.16, alt: 0.44, drift: 0.07 };
+  let layout = { horizon: -0.12, baseX: 0.45, minX: -1, maxX: 1, r: 0.16, alt: 0.4, drift: 0.06, text: new Float32Array(16) };
   let palette = null;
   const mouse = { x: 0, y: 0, strength: 0, target: 0 };
   let visible = true;
   let raf = 0;
   let last = performance.now();
   let lastAstro = 0;
-  let reveal = reducedMotion.matches ? 1 : 0;
+  let reveal = calm() ? 1 : 0;
   let ready = false;
   let scrubbing = false;
 
@@ -118,30 +119,100 @@ export function initSky() {
     palette.golden = Object.fromEntries(Object.entries(GOLDEN[theme()]).map(([key, hex]) => [key, hexToRgb(hex)]));
   }
 
-  function computeLayout(width, height) {
-    const aspect = width / height;
-    if (aspect > 1.05) {
-      // Wide hero: the sky sits to the right of the name, sunsets clear the sky panel.
-      layout = { horizon: -0.12, baseX: aspect * 0.5 * 0.55, r: 0.16, alt: 0.4, drift: 0.07 };
-    } else if (aspect > 0.7) {
-      // Phone "window" above the text: the sky gets the whole frame.
-      layout = { horizon: -0.24, baseX: aspect * 0.5 * 0.18, r: 0.15, alt: 0.5, drift: 0.05 };
-    } else {
-      layout = { horizon: 0.04, baseX: aspect * 0.5 * 0.22, r: Math.min(0.12, aspect * 0.27), alt: 0.32, drift: 0.035 };
+  /** The hero's text blocks, in host pixels: eyebrow, the two name lines, lede, buttons. */
+  function textBoxes() {
+    const origin = host.getBoundingClientRect();
+    const union = (rects) => {
+      const list = rects.filter((r) => r && r.width && r.height);
+      if (!list.length) return null;
+      return {
+        left: Math.min(...list.map((r) => r.left)) - origin.left,
+        right: Math.max(...list.map((r) => r.right)) - origin.left,
+        top: Math.min(...list.map((r) => r.top)) - origin.top,
+        bottom: Math.max(...list.map((r) => r.bottom)) - origin.top,
+      };
+    };
+    // Name lines are full-width blocks; their letters give the real extent.
+    const name = union(
+      $$('.hero-line', hero).map((line) => {
+        const chars = $$('.ch', line);
+        const box = line.getBoundingClientRect();
+        if (!chars.length) return box;
+        const first = chars[0].getBoundingClientRect();
+        const last = chars[chars.length - 1].getBoundingClientRect();
+        return { left: first.left, right: last.right, top: box.top, bottom: box.bottom, width: last.right - first.left, height: box.height };
+      }),
+    );
+    return [
+      union([$('.eyebrow', hero)?.getBoundingClientRect()]),
+      name,
+      union([$('.hero-lede', hero)?.getBoundingClientRect()]),
+      union($$('.hero-cta > *', hero).map((el) => el.getBoundingClientRect())),
+    ].filter(Boolean);
+  }
+
+  /**
+   * Where the sky draws its sun, moon and horizon. In the full-bleed hero the
+   * layout is measured from the DOM, so the sun never sits behind the name and
+   * a setting sun stays above the sky panel. On phones and portrait tablets
+   * the sky is a window above the text and keeps a centred composition.
+   */
+  function computeLayout() {
+    const rect = host.getBoundingClientRect();
+    const W = rect.width;
+    const H = rect.height;
+    if (!W || !H) return;
+    const toScene = (b, pad) => [(b.left - pad - W / 2) / H, (H / 2 - b.bottom - pad) / H, (b.right + pad - W / 2) / H, (H / 2 - b.top + pad) / H];
+    const boxes = textBoxes();
+    const text = new Float32Array(16);
+    boxes.slice(0, 4).forEach((box, i) => text.set(toScene(box, 14), i * 4));
+
+    if (getComputedStyle(host).position !== 'absolute') {
+      const aspect = W / H;
+      const r = 0.15;
+      const edge = aspect * 0.5 - r * 0.7;
+      layout = { horizon: -0.24, baseX: aspect * 0.5 * 0.18, minX: -edge, maxX: edge, r, alt: 0.5, drift: 0.05, text };
+      return;
     }
+
+    const vh = innerHeight;
+    const rPx = Math.min(0.16 * Math.min(H, vh * 1.05), 0.2 * W, 210);
+    const textRight = boxes.length ? Math.max(...boxes.map((b) => b.right)) : 0;
+    const maxX = W - rPx * 0.5;
+    const minX = Math.min(maxX, textRight + rPx * 1.35);
+    const preferred = Math.max(W * 0.72, minX);
+
+    let horizonPx = Math.min(H * 0.62, vh * 0.66);
+    if (getComputedStyle(panel).position === 'absolute') {
+      horizonPx = Math.min(horizonPx, panel.getBoundingClientRect().top - rect.top - rPx * 0.35);
+    }
+    horizonPx = Math.max(horizonPx, H * 0.4);
+    const zenithPx = parseFloat(cssVar('--topbar-h')) + 8 + rPx * 0.9;
+
+    layout = {
+      horizon: 0.5 - horizonPx / H,
+      baseX: (preferred - W / 2) / H,
+      minX: (minX - W / 2) / H,
+      maxX: (maxX - W / 2) / H,
+      r: rPx / H,
+      alt: Math.max(rPx, horizonPx - zenithPx) / H,
+      drift: (0.06 * vh) / H,
+      text,
+    };
   }
 
   function uniforms(time) {
     const a = astro;
     const s = a.sunAlt;
     const golden = s > -3 && s < 14 ? 1 - smoothstep(0, 14, s) : 0;
-    const drift = (bearing) => clamp((bearing - 180) / 90, -1.2, 1.2) * layout.drift;
+    // East (morning) drifts left, west (evening) right, never into the text.
+    const x = (bearing) => clamp(layout.baseX + clamp((bearing - 180) / 90, -1.2, 1.2) * layout.drift, layout.minX, layout.maxX);
 
     const sunR = layout.r * (1 + 0.1 * golden);
-    const sun = [layout.baseX + drift(a.sunBearing), layout.horizon + Math.sin((s * Math.PI) / 180) * layout.alt, sunR, smoothstep(-7, 0.5, s)];
+    const sun = [x(a.sunBearing), layout.horizon + Math.sin((s * Math.PI) / 180) * layout.alt, sunR, smoothstep(-7, 0.5, s)];
     const moonVisible = (1 - smoothstep(-8, -2, s)) * smoothstep(-3, 2, a.moonAlt);
     const moon = [
-      layout.baseX + drift(a.moonBearing),
+      x(a.moonBearing),
       layout.horizon + Math.sin((a.moonAlt * Math.PI) / 180) * layout.alt,
       layout.r * 0.82,
       moonVisible,
@@ -155,6 +226,7 @@ export function initSky() {
       moon,
       moonLight: a.moonLight,
       sky,
+      text: layout.text,
       mouse: [mouse.x, mouse.y, mouse.strength],
       reveal,
       palette: {
@@ -179,7 +251,7 @@ export function initSky() {
     const rect = host.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
     renderer.resize(rect.width, rect.height, Math.min(window.devicePixelRatio || 1, 2));
-    computeLayout(rect.width, rect.height);
+    computeLayout();
     skyStats.glyphs = renderer.size.cols * renderer.size.rows;
     draw(performance.now() / 1000);
   }
@@ -226,7 +298,7 @@ export function initSky() {
 
   function schedule() {
     if (raf || !renderer || !visible || document.hidden) return;
-    if (reducedMotion.matches && !clock.tween && !clock.playing) return;
+    if (calm() && !clock.tween && !clock.playing) return;
     raf = requestAnimationFrame(frame);
   }
 
@@ -234,7 +306,7 @@ export function initSky() {
   function refresh() {
     computeAstro(displayed());
     updatePanel();
-    if (reducedMotion.matches) draw(0);
+    if (calm()) draw(0);
     schedule();
   }
 
@@ -272,7 +344,7 @@ export function initSky() {
       : { label: TEXT.moon, alt: a.moonAlt, bearing: a.moonBearing };
     fields.bodyLabel.textContent = pick(body.label);
     fields.body.textContent = `${body.alt >= 0 ? '↑' : '↓'} ${one.format(Math.abs(body.alt))}° · ${compass(body.bearing)}`;
-    fields.sunTimes.textContent = day.sun.rise && day.sun.set ? `${A.formatClock(day.sun.rise)} → ${A.formatClock(day.sun.set)}` : '—';
+    fields.sunTimes.textContent = day.sun.rise && day.sun.set ? `${A.formatClock(day.sun.rise)} → ${A.formatClock(day.sun.set)}` : '--:--';
     fields.moon.textContent = `${pick(PHASES[A.phaseIndex(a.illumination.phase)])} · ${Math.round(a.illumination.fraction * 100)}%`;
 
     if (!scrubbing) range.value = String(clamp(Math.round(A.natalMinutes(a.ms)), 0, 1439));
@@ -299,7 +371,7 @@ export function initSky() {
     const from = displayed();
     clock.mode = 'sim';
     clock.sim = from;
-    if (reducedMotion.matches) {
+    if (calm()) {
       clock.sim = target;
       if (live) clock.mode = 'live';
       refresh();
@@ -338,7 +410,7 @@ export function initSky() {
       mouse.x = (event.clientX - rect.left - rect.width / 2) / rect.height;
       mouse.y = (rect.height / 2 - (event.clientY - rect.top)) / rect.height;
       const overUi = event.target.closest('.skypanel, .btn, .topbar');
-      mouse.target = overUi ? 0 : 1;
+      mouse.target = overUi || calm() ? 0 : 1;
     });
     hero.addEventListener('pointerleave', () => (mouse.target = 0));
   }
@@ -353,19 +425,24 @@ export function initSky() {
     last = performance.now();
     schedule();
   });
-  reducedMotion.addEventListener?.('change', () => {
+  onMotion(() => {
     reveal = 1;
+    mouse.target = 0;
     refresh();
   });
   // Without the animation loop, the live clock and sky still need to tick.
   setInterval(() => {
-    if (reducedMotion.matches && clock.mode === 'live' && visible && !document.hidden) refresh();
+    if (calm() && clock.mode === 'live' && visible && !document.hidden) refresh();
   }, 1000);
   onTheme(() => {
     buildPalette();
     draw(performance.now() / 1000);
   });
   onLang(() => {
+    requestAnimationFrame(() => {
+      computeLayout();
+      if (calm()) draw(0);
+    });
     updatePanel();
     $('span', playButton).textContent = pick(clock.playing ? TEXT.pause : TEXT.play);
   });
@@ -420,7 +497,10 @@ export function initSky() {
       if (!renderer) return;
       resize();
       last = performance.now();
-      if (reducedMotion.matches) draw(0);
+      if (calm()) draw(0);
       schedule();
+      // Fonts and the intro animation both move the text; measure again once they settle.
+      document.fonts?.ready.then(() => computeLayout());
+      setTimeout(computeLayout, 2200);
     });
 }

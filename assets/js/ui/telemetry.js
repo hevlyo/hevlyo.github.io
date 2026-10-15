@@ -1,4 +1,5 @@
 import { $, $$, watchVisibility, reducedMotion } from '../core/util.js';
+import { calm } from '../core/motion.js';
 import { pick, onLang, lang } from '../core/i18n.js';
 import { skyStats } from '../sky/sky.js';
 
@@ -38,8 +39,8 @@ export function initTelemetry() {
     fields.weight.innerHTML = `${dec.format(m.kb * k)}${unit(m.cached ? 'KB · cache' : 'KB')}`;
     fields.requests.textContent = int.format(Math.round(m.requests * k));
     fields.ready.innerHTML = `${int.format(m.ready * k)}${unit('ms')}`;
-    fields.fps.innerHTML = m.fps ? `${int.format(m.fps * k)}${unit('fps')}` : `—${unit(skyStats.webgl ? pick(['aguardando', 'waiting']) : pick(['sem WebGL', 'no WebGL']))}`;
-    fields.glyphs.textContent = m.glyphs ? int.format(Math.round(m.glyphs * k)) : '—';
+    fields.fps.innerHTML = m.fps ? `${int.format(m.fps * k)}${unit('fps')}` : skyStats.webgl ? (calm() ? `0${unit(pick(['fps · estático', 'fps · static']))}` : `…${unit(pick(['aguardando', 'waiting']))}`) : `n/d${unit(pick(['sem WebGL', 'no WebGL']))}`;
+    fields.glyphs.textContent = m.glyphs ? int.format(Math.round(m.glyphs * k)) : '…';
     fields.dom.textContent = int.format(Math.round(m.dom * k));
   }
 

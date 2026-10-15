@@ -62,9 +62,9 @@ export function escapeHtml(text) {
   return String(text).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 }
 
-/** Lowercase, strip accents — used by every search/match in the site. */
+/** Lowercase and strip accents; used by every search and match in the site. */
 export function normalize(text) {
-  return String(text).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  return String(text).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
 
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

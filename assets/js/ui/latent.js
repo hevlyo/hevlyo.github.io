@@ -1,4 +1,5 @@
-import { $, $$, h, clamp, reducedMotion, watchVisibility } from '../core/util.js';
+import { $, $$, h, clamp, finePointer, watchVisibility } from '../core/util.js';
+import { calm, onMotion } from '../core/motion.js';
 import { pick, onLang } from '../core/i18n.js';
 
 // Where each group sits in the map (fractions of width/height).
@@ -10,7 +11,7 @@ const CLUSTERS = {
   front: { x: 0.76, y: 0.83 },
 };
 
-// Conceptual neighbours — tools that tend to show up in the same systems.
+// Conceptual neighbours: tools that tend to show up in the same systems.
 const EDGES = [
   ['python', 'fastapi'], ['python', 'ml'], ['ml', 'transformers'], ['python', 'transformers'], ['llms', 'python'],
   ['llms', 'agents'], ['agents', 'tools'], ['llms', 'rag'], ['rag', 'embeddings'], ['embeddings', 'pgvector'],
@@ -27,9 +28,9 @@ const EDGES = [
 const NOTES = {
   python: ['FastAPI, Machine Learning e automação.', 'FastAPI, machine learning and automation.'],
   llms: ['OpenAI, Claude e modelos open-source em sistemas reais.', 'OpenAI, Claude and open-source models in real systems.'],
-  agents: ['Agentes com tool calling — e as ferramentas que eles usam, como o ibx.', 'Agents with tool calling — and the tools they use, like ibx.'],
+  agents: ['Agentes com tool calling. O ibx é uma ferramenta feita para eles.', 'Agents with tool calling. ibx is a tool built for them.'],
   tools: ['Agentes que chamam APIs e ferramentas de verdade.', 'Agents that call real APIs and tools.'],
-  rag: ['Recuperação + geração. A paleta ⌘K deste site faz o “R” com BM25.', 'Retrieval + generation. This site’s ⌘K palette does the “R” with BM25.'],
+  rag: ['Recuperação e geração. A paleta ⌘K deste site faz a recuperação com BM25.', 'Retrieval and generation. This site’s ⌘K palette does the retrieval with BM25.'],
   embeddings: ['Busca semântica sobre dados próprios.', 'Semantic search over your own data.'],
   pgvector: ['Vetores dentro do Postgres, sem banco extra.', 'Vectors inside Postgres, no extra database.'],
   ml: ['Machine Learning aplicado na PGM Natal.', 'Machine learning applied at PGM Natal.'],
@@ -38,7 +39,7 @@ const NOTES = {
   graphql: ['Nos microsserviços da AMentoria.', 'In AMentoria’s microservices.'],
   kafka: ['Arquitetura orientada a eventos na AMentoria.', 'Event-driven architecture at AMentoria.'],
   fastapi: ['APIs na PGM Natal.', 'APIs at PGM Natal.'],
-  postgres: ['Na PGM Natal — e com pgvector para busca semântica.', 'At PGM Natal — plus pgvector for semantic search.'],
+  postgres: ['Usado na PGM Natal. Com pgvector, também faz busca semântica.', 'Used at PGM Natal. With pgvector it also handles semantic search.'],
   ts: ['De ponta a ponta: ShellShield, serviços NestJS e front-end.', 'End to end: ShellShield, NestJS services and front-end.'],
   bun: ['Runtime e compilador do ShellShield.', 'ShellShield’s runtime and compiler.'],
   webgl: ['O céu ASCII lá no topo desta página.', 'The ASCII sky at the top of this page.'],
@@ -49,7 +50,9 @@ const NOTES = {
   socketio: ['Tempo real sobre WebSockets.', 'Real time over WebSockets.'],
 };
 
-const HINT = ['Passe o mouse — ou use Tab — em qualquer ferramenta.', 'Hover — or Tab to — any tool.'];
+const HINT = finePointer.matches
+  ? ['Passe o mouse, ou use Tab e as setas, em qualquer ferramenta.', 'Hover, or use Tab and the arrow keys, on any tool.']
+  : ['Toque em qualquer ferramenta.', 'Tap any tool.'];
 
 /** Tiny seeded PRNG so the layout is the same on every visit. */
 function seeded(seed) {
@@ -155,6 +158,8 @@ export function initLatent() {
     height = rect.height;
     if (!width || !height) return false;
 
+    // The hint box lives in the bottom-left corner; nodes stay out of it.
+    const tipZone = { right: 18 + Math.min(460, width - 36) + 12, top: height - 18 - Math.max(tip.offsetHeight, 84) - 12 };
     for (const node of nodes) {
       node.w = node.element.offsetWidth;
       node.h = node.element.offsetHeight;
@@ -192,6 +197,7 @@ export function initLatent() {
       for (const node of nodes) {
         node.x = clamp(node.x, node.w / 2 + 24, width - node.w / 2 - 24);
         node.y = clamp(node.y, node.h / 2 + 52, height - node.h / 2 - 24);
+        if (node.x - node.w / 2 < tipZone.right && node.y + node.h / 2 > tipZone.top) node.y = tipZone.top - node.h / 2;
       }
     }
 
@@ -221,7 +227,7 @@ export function initLatent() {
   function place(time) {
     pointer.x += (pointer.tx - pointer.x) * 0.06;
     pointer.y += (pointer.ty - pointer.y) * 0.06;
-    const still = reducedMotion.matches;
+    const still = calm();
     for (const node of nodes) {
       const floatX = still ? 0 : Math.sin(time * 0.45 + node.phase) * 3.2;
       const floatY = still ? 0 : Math.cos(time * 0.38 + node.phase * 1.3) * 3.2;
@@ -245,7 +251,7 @@ export function initLatent() {
   function frame(now) {
     raf = 0;
     place(now / 1000);
-    if (visible && !reducedMotion.matches) raf = requestAnimationFrame(frame);
+    if (visible && !calm()) raf = requestAnimationFrame(frame);
   }
 
   function start() {
@@ -269,7 +275,7 @@ export function initLatent() {
     const cluster = clusters.get(node.group);
     tip.append(h('b', {}, node.element.textContent), h('span', {}, cluster.heading.textContent.trim()));
     const note = NOTES[node.id];
-    if (note) tip.append(' — ', pick(note));
+    if (note) tip.append(' · ', pick(note));
   }
 
   function focusNode(node) {
@@ -287,16 +293,38 @@ export function initLatent() {
     showTip(node);
   }
 
-  for (const node of nodes) {
+  let roving = 0;
+  const moveTo = (index) => {
+    roving = (index + nodes.length) % nodes.length;
+    nodes.forEach((node, i) => node.element.setAttribute('tabindex', i === roving ? '0' : '-1'));
+    nodes[roving].element.focus();
+  };
+
+  nodes.forEach((node, index) => {
+    node.element.setAttribute('tabindex', index === 0 ? '0' : '-1');
+    node.element.setAttribute('aria-pressed', 'false');
     node.element.addEventListener('pointerenter', () => focusNode(node));
-    node.element.addEventListener('focus', () => focusNode(node));
+    node.element.addEventListener('focus', () => {
+      roving = index;
+      nodes.forEach((other, i) => other.element.setAttribute('tabindex', i === index ? '0' : '-1'));
+      focusNode(node);
+    });
     node.element.addEventListener('pointerleave', () => focusNode(pinned));
     node.element.addEventListener('blur', () => focusNode(pinned));
     node.element.addEventListener('click', () => {
       pinned = pinned === node ? null : node;
+      nodes.forEach((other) => other.element.setAttribute('aria-pressed', String(other === pinned)));
       focusNode(pinned || node);
     });
-  }
+    node.element.addEventListener('keydown', (event) => {
+      const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
+      if (step) moveTo(roving + step);
+      else if (event.key === 'Home') moveTo(0);
+      else if (event.key === 'End') moveTo(nodes.length - 1);
+      else return;
+      event.preventDefault();
+    });
+  });
 
   map.addEventListener('pointermove', (event) => {
     const rect = map.getBoundingClientRect();
@@ -319,6 +347,10 @@ export function initLatent() {
   onLang(() => {
     syncText();
     relayout();
+  });
+  onMotion(() => {
+    place(performance.now() / 1000);
+    start();
   });
   watchVisibility(map, (isVisible) => {
     visible = isVisible;

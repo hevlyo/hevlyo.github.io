@@ -1,7 +1,8 @@
 // An in-browser port of a subset of ShellShield's rules (github.com/hevlyo/ShellShield).
 // Reasons and suggestions are the CLI's own strings, so blocked output matches the real tool.
 
-import { $, h, escapeHtml, reducedMotion, sleep } from '../core/util.js';
+import { $, h, escapeHtml, sleep } from '../core/util.js';
+import { calm } from '../core/motion.js';
 import { pick, onLang, lang } from '../core/i18n.js';
 
 /* ---------- Rule data (from src/constants.ts and src/security/patterns.ts) ---------- */
@@ -257,22 +258,22 @@ function benchmark(command) {
 /* ---------- Fake shell for allowed commands ---------- */
 
 const TEXT = {
-  title: ['zsh — ~/projeto', 'zsh — ~/project'],
+  title: ['zsh · ~/projeto', 'zsh · ~/project'],
   badge: ['protegido', 'protected'],
-  placeholder: ['digite um comando…', 'type a command…'],
+  placeholder: ['comando…', 'command…'],
   run: ['executar', 'run'],
   intro: [
-    ['ShellShield 1.1.0 · demo no navegador', 'Subconjunto das regras do CLI, com as mesmas mensagens.', 'Nada é executado de verdade. Digite um comando ou toque em um exemplo.'],
+    ['ShellShield 1.1.0 · demo no navegador', 'Subconjunto das regras do CLI, com as mesmas mensagens.', 'Nada é executado aqui. Digite um comando ou toque em um exemplo.'],
     ['ShellShield 1.1.0 · in-browser demo', 'A subset of the CLI’s rules, with the same messages.', 'Nothing actually runs. Type a command or tap an example.'],
   ],
   allowed: ['permitido', 'allowed'],
   timing: ['analisado em {t} µs (média de {n} execuções no seu navegador)', 'analyzed in {t} µs (average of {n} runs in your browser)'],
-  trusted: ['domínio confiável ({host}) — liberado pela allowlist', 'trusted domain ({host}) — allowed by the allowlist'],
-  demo: ['(demo) permitido — nada roda aqui de verdade.', '(demo) allowed — nothing really runs here.'],
+  trusted: ['domínio confiável ({host}), liberado pela allowlist', 'trusted domain ({host}), allowed by the allowlist'],
+  demo: ['(demo) permitido. Nada é executado aqui.', '(demo) allowed. Nothing runs here.'],
   trashed: ['{f} → lixeira (recuperável)', '{f} → trash (recoverable)'],
-  installed: ['(demo) nada foi instalado — mas o ShellShield deixaria passar.', '(demo) nothing was installed — but ShellShield would let it through.'],
+  installed: ['(demo) nada foi instalado, mas o ShellShield deixaria passar.', '(demo) nothing was installed, but ShellShield would let it through.'],
   examples: ['exemplos', 'examples'],
-  homograph: ['↳ {c} é {code} {name} — não é a letra latina.', '↳ {c} is {code} {name} — not the Latin letter.'],
+  homograph: ['↳ {c} é {code} {name}, não a letra latina.', '↳ {c} is {code} {name}, not the Latin letter.'],
   hidden: ['↳ caractere invisível {code} escondido no comando.', '↳ invisible character {code} hidden in the command.'],
   help: [
     'Tente: rm -rf /  ·  curl … | bash  ·  sh -c "rm -rf /etc"  ·  trash <arquivo>  ·  clear',
@@ -350,7 +351,7 @@ export function mount(host) {
 
   const title = h('span', { class: 'win-title' });
   const badge = h('span', { class: 'win-badge' });
-  const body = h('div', { class: 'term-body', role: 'log', 'aria-live': 'polite', tabindex: '-1' });
+  const body = h('div', { class: 'term-body', role: 'log', 'aria-live': 'polite', tabindex: '0' });
   const input = h('input', { class: 'term-input', type: 'text', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', enterkeyhint: 'send' });
   const runButton = h('button', { class: 'term-run', type: 'submit' });
   const form = h('form', { class: 'term-form' }, h('span', { class: 't-prompt', 'aria-hidden': 'true' }, '❯'), input, runButton);
@@ -373,6 +374,7 @@ export function mount(host) {
     badge.textContent = pick(TEXT.badge);
     input.placeholder = pick(TEXT.placeholder);
     input.setAttribute('aria-label', pick(['Comando para o ShellShield analisar', 'Command for ShellShield to analyze']));
+    body.setAttribute('aria-label', pick(['Saída do terminal', 'Terminal output']));
     runButton.textContent = pick(TEXT.run);
     chips.setAttribute('aria-label', pick(TEXT.examples));
     if (introBlock) {
@@ -441,7 +443,7 @@ export function mount(host) {
     if (typing) return;
     typing = true;
     input.value = '';
-    if (!reducedMotion.matches) {
+    if (!calm()) {
       for (const char of command) {
         input.value += char;
         await sleep(command.length > 40 ? 9 : 16);

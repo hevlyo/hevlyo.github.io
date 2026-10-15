@@ -1,6 +1,7 @@
 import { $, $$, isMac } from '../core/util.js';
 import { pick, onLang, toggleLang } from '../core/i18n.js';
 import { formatClock } from '../sky/astro.js';
+import { isStill, toggleStill, onMotion } from '../core/motion.js';
 
 /* ---------- Top bar: blur when scrolled, hide on the way down, track the section ---------- */
 
@@ -53,12 +54,32 @@ export function initTopbar() {
 
 /* ---------- Language toggle ---------- */
 
-const LANG_LABEL = ['Mudar o idioma para inglês', 'Switch language to Portuguese'];
+// Starts with the visible text so voice-control users can say what they see.
+const LANG_LABEL = ['PT / EN: mudar o idioma para inglês', 'PT / EN: switch language to Portuguese'];
 
 export function initLangToggle() {
   const buttons = $$('[data-lang-toggle]');
   const sync = () => buttons.forEach((button) => button.setAttribute('aria-label', pick(LANG_LABEL)));
   buttons.forEach((button) => button.addEventListener('click', toggleLang));
+  onLang(sync);
+  sync();
+}
+
+/* ---------- Pause / resume ambient motion ---------- */
+
+const MOTION_LABEL = { pause: ['Pausar animações', 'Pause animations'], resume: ['Retomar animações', 'Resume animations'] };
+
+export function initMotionToggle() {
+  const buttons = $$('[data-motion-toggle]');
+  const sync = () => {
+    const still = isStill();
+    for (const button of buttons) {
+      $('[data-motion-label]', button).textContent = pick(still ? MOTION_LABEL.resume : MOTION_LABEL.pause);
+      $('use', button)?.setAttribute('href', still ? '#i-play' : '#i-pause');
+    }
+  };
+  buttons.forEach((button) => button.addEventListener('click', toggleStill));
+  onMotion(sync);
   onLang(sync);
   sync();
 }
