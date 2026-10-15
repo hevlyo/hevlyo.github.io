@@ -1,0 +1,13 @@
+{
+  "name": "Riquelme Soares — Full-Stack & AI Engineer",
+  "short_name": "Riquelme",
+  "description": "Sistemas que funcionam sozinhos. Natal, RN.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0a09",
+  "theme_color": "#0b0a09",
+  "icons": [
+    { "src": "/assets/img/favicon.svg", "type": "image/svg+xml", "sizes": "any" },
+    { "src": "/assets/img/apple-touch-icon.png", "type": "image/png", "sizes": "180x180" }
+  ]
+}

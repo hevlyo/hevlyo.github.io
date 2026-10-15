@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>404 — Riquelme Soares</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0b0a09">
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/assets/fonts/instrument-serif.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/geist-mono.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <script>
+    (function () {
+      try {
+        var theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    .lost {
+      min-height: 100vh;
+      min-height: 100svh;
+      display: grid;
+      align-content: center;
+      gap: clamp(28px, 5vh, 48px);
+      padding: 48px var(--pad);
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    .lost-code {
+      margin: 0;
+      font: 400 clamp(120px, 26vw, 300px)/0.8 var(--font-serif);
+      letter-spacing: -0.04em;
+    }
+    .lost-code em {
+      color: var(--accent-text);
+    }
+    .lost .artifact {
+      padding: 22px 24px;
+      font-size: 13px;
+    }
+    .lost .artifact p {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .lost .t-rule {
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .lost .t-cyan a {
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .lost-note {
+      margin: 0;
+      font: 400 13px/1.6 var(--font-mono);
+      color: var(--fg-3);
+    }
+  </style>
+</head>
+<body>
+  <main class="lost">
+    <p class="lost-code" aria-hidden="true">4<em>0</em>4</p>
+    <div class="artifact" role="alert">
+      <p><span class="t-prompt">❯</span> cd <span data-path>/página</span></p>
+      <p>&nbsp;</p>
+      <p><span class="t-red">🛡️ </span>ShellShield <span class="t-red t-bold">BLOCKED</span>: PATH NOT FOUND</p>
+      <p class="t-rule" aria-hidden="true">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</p>
+      <p><span class="t-yellow t-bold">ACTION REQUIRED:</span> <span class="t-cyan"><a href="/">cd /</a></span></p>
+      <p class="t-rule" aria-hidden="true">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</p>
+      <p class="t-dim">ShellShield - Keeping your terminal safe.</p>
+    </div>
+    <p class="lost-note">
+      Esta página não existe — ou é sigilosa. <a class="link-arrow" href="/">Voltar ao início</a><br>
+      This page doesn’t exist — or it’s classified. <a class="link-arrow" href="/">Back home</a>
+    </p>
+  </main>
+  <script>
+    document.querySelector('[data-path]').textContent = decodeURIComponent(location.pathname);
+  </script>
+</body>
+</html>
